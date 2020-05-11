@@ -53,7 +53,7 @@ flightSuretyApp.events.OracleRequest({
     let airline = event.returnValues.airline;
     let flight = event.returnValues.flight;
     let timestamp = event.returnValues.timestamp;
-    let status = 20; //(Math.floor(Math.random() * Math.floor(5)) * 10);
+    let status = (Math.floor(Math.random() * Math.floor(5)) * 10);
     console.log("random status", status);
     for (let i = 0; i < oracles.length; i++) {
       for (let j = 0; j < 3; j++) {

@@ -50,7 +50,11 @@ export default class Contract {
                 console.log(error,result);
             })
 
-            this.flights[0] = {flight: 'CA888', address: this.airlines[0], timestamp: null};
+            this.flights[0] = {flight: 'CA888', address: this.airlines[0], timestamp: null, landed: false};
+            this.flights[1] = {flight: 'CA878', address: this.airlines[0], timestamp: null, landed: false};
+            this.flights[2] = {flight: 'CA868', address: this.airlines[0], timestamp: null, landed: false};
+            this.flights[3] = {flight: 'CA858', address: this.airlines[0], timestamp: null, landed: false};
+
 
             callback();
         });
@@ -102,7 +106,7 @@ export default class Contract {
         let self = this;
         self.flightSuretyApp.methods
              .withdraw()
-             .send({from: self.passengers[0], gas: 3000000}, (error, result) => {
+             .send({from: self.passengers[0], gas: 6700000}, (error, result) => {
                 console.log(error, result);
                 callback(error, result);
             });
@@ -126,6 +130,21 @@ export default class Contract {
             .fetchFlightStatus(payload.airline, payload.flight, payload.timestamp)
             .send({ from: self.owner}, (error, result) => {
                 callback(error, payload);
+            });
+    }
+
+    checkFlightStatus(flight, callback) {
+        let self = this;
+        let payload = {
+            flight: flight.flight,
+            airline: flight.address,
+            timestamp: flight.timestamp
+        } 
+        self.flightSuretyApp.methods
+            .checkFlightStatus(payload.airline, payload.flight, payload.timestamp)
+            .call({ from: self.owner}, (error, result) => {
+                console.log(error, result);
+                callback(error, result);
             });
     }
 }

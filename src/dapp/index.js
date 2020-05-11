@@ -16,12 +16,16 @@ import './flightsurety.css';
             display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         });
 
-        contract.flights[0].timestamp = Math.floor(Date.now() / 1000);
-        console.log("Timestamp of flight: "+contract.flights[0].timestamp);
-        contract.registerFlight(contract.flights[0], (error, result) => {
-            console.log(error)
-            // Retrieve the information for the flight just registered to the Blockchain
-        });
+        for (let i = 0; i < contract.flights.length; i++) {
+
+            contract.flights[i].timestamp = Math.floor(Date.now() / 1000);
+            console.log("Timestamp of flight: "+contract.flights[0].timestamp);
+            contract.registerFlight(contract.flights[i], (error, result) => {
+                console.log(error)
+                display('Flight', 'Register flights', [ { label: 'Insurance Available for', error: error, value: contract.flights[i].flight} ]);
+                // Retrieve the information for the flight just registered to the Blockchain
+            });
+        }
     
 
         // User-submitted transaction
@@ -34,10 +38,45 @@ import './flightsurety.css';
                     break;
                 }
             }
+            flight.landed = true;
             // Write transaction
             if (flight != null) {
                 contract.fetchFlightStatus(flight, (error, result) => {
                     display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
+                });
+            }
+        })
+
+        DOM.elid('check-status').addEventListener('click', () => {
+            let flight = null;
+            let flightCode = DOM.elid('flight-number').value;
+            for(let i = 0; i < contract.flights.length; i++) {
+                if(contract.flights[i].flight == flightCode) {
+                    flight = contract.flights[i];
+                    break;
+                }
+            }
+            // Write transaction
+            if (flight != null) {
+                contract.checkFlightStatus(flight, (error, result) => {
+
+                    let status = "Unknown";
+                    if (result == 10) {
+                        status = "On time";
+                    } else if (result == 20) {
+                        status = "Late due to airline";
+                    } else if (result == 30) {
+                        status = "Late due to weather";
+                    } else if (result == 40) {
+                        status = "Late due to technical reasons";
+                    } else if (result == 50) {
+                        status = "Late due to other reasons";
+                    } else if (result == 60) {
+                        status = "Late due to airline, and processed";
+                    }
+                    
+
+                    display('Flight', 'Check status', [ { label: 'Flight Status', error: error, value: status} ]);
                 });
             }
         })
@@ -51,14 +90,15 @@ import './flightsurety.css';
                     break;
                 }
             }
-
-            if (flight != null) {
+            if (flight.landed) {
+                display('Passenger', 'Buy Insurance', [ { label: 'Flight ', error: null, value: flight.flight + ' has landed, you cannot buy insurance for landed flights' }]);
+            } else if (flight != null) {
                 let premium = DOM.elid('insurance-premium').value;
                 console.log(flight);
                 console.log(premium);
                 contract.buy(flight, premium, (error, result) => {
                     console.log(error, result);
-                    display('Passenger', 'Buy Insurance', [ { label: 'Flight: ', error: error, value: flight.flight + ' for ' + premium + ' wei'} ]);
+                    display('Passenger', 'Buy Insurance', [ { label: 'Flight ', error: error, value: flight.flight + ' for ' + premium + ' wei'} ]);
                 });
             }
         })

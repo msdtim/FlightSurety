@@ -318,6 +318,7 @@ contract FlightSuretyApp {
                             uint256 timestamp
                         )
                         external
+                        requireIsOperational
     {
         uint8 index = getRandomIndex(msg.sender);
 
@@ -329,6 +330,20 @@ contract FlightSuretyApp {
                                             });
 
         emit OracleRequest(index, airline, flight, timestamp);
+    }
+
+    function checkFlightStatus(
+                                    address airline,
+                                    string calldata flight,
+                                    uint256 timestamp
+                                )
+                                external
+                                view
+                                requireIsOperational 
+                                returns (uint)
+    {
+        bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+        return flights[flightKey].statusCode;
     }
 
 

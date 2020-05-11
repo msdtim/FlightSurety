@@ -37,7 +37,7 @@ It is developed using node.js and webpack.
 A web server is created simulate the oracle response.
 It is developed using node.js, express and webpack.
 
-
+![Screenshot](./Screen%20Shot%202020-05-11%20at%207.44.31%20PM.png?raw=true "Screenshot")
 
 ## Install
 
